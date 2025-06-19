@@ -43,3 +43,17 @@ export const usePostMessage = () => {
     },
   });
 };
+
+export const useDeleteMessage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      mockMessages = mockMessages.filter((msg) => msg.id !== id);
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+    },
+  });
+};
