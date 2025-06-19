@@ -38,9 +38,19 @@ export const usePostMessage = () => {
       return newMsg;
     },
 
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages"] });
-    },
+    onMutate: async ({text}) => {
+      await queryClient.cancelQueries({queryKey: ['messages']});
+
+      const previousMessages = queryClient.getQueryData<Message[]>(['messages']) || [];
+
+      const optimisticMsg: Message = {
+        id: 'tem-' + Date.now(),
+        text,
+        createdAt: new Date().toISOString()
+      }
+    }
+
+   
   });
 };
 
