@@ -34,23 +34,40 @@ export const usePostMessage = () => {
         text,
         createdAt: new Date().toISOString(),
       };
+      await new Promise((res) => setTimeout(res, 500));
       mockMessages.push(newMsg);
       return newMsg;
     },
 
-    onMutate: async ({text}) => {
-      await queryClient.cancelQueries({queryKey: ['messages']});
+    onMutate: async ({ text }) => {
+      await queryClient.cancelQueries({ queryKey: ["messages"] });
 
-      const previousMessages = queryClient.getQueryData<Message[]>(['messages']) || [];
+      const previousMessages =
+        queryClient.getQueryData<Message[]>(["messages"]) || [];
 
       const optimisticMsg: Message = {
-        id: 'tem-' + Date.now(),
+        id: "temp-" + Date.now(),
         text,
-        createdAt: new Date().toISOString()
-      }
-    }
+        createdAt: new Date().toISOString(),
+      };
 
-   
+      queryClient.setQueryData(
+        ["messages"],
+        [...previousMessages, optimisticMsg]
+      );
+
+      return { previousMessages };
+    },
+
+    onError: (err, _, context) => {
+      if (context?.previousMessages) {
+        queryClient.setQueryData(["messages"], context.previousMessages);
+      }
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["messages"] });
+    },
   });
 };
 
