@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { loadMessages, saveMessages } from "../utilities/messageStorage";
 
 type Message = {
   id: string;
@@ -6,13 +7,7 @@ type Message = {
   createdAt: string;
 };
 
-let mockMessages: Message[] = [
-  {
-    id: "1",
-    text: "Welcome to Pulseboard!",
-    createdAt: new Date().toISOString(),
-  },
-];
+let mockMessages: Message[] = loadMessages();
 
 export const useMessages = () => {
   return useQuery<Message[]>({
@@ -37,6 +32,7 @@ export const usePostMessage = () => {
       };
       await new Promise((res) => setTimeout(res, 500));
       mockMessages.push(newMsg);
+      saveMessages(mockMessages);
       return newMsg;
     },
 
