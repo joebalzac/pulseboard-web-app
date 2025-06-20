@@ -21,6 +21,7 @@ export const useMessages = () => {
       await new Promise((r) => setTimeout(r, 300));
       return [...mockMessages];
     },
+    refetchInterval: 2000,
   });
 };
 
